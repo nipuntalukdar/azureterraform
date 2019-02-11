@@ -1,0 +1,39 @@
+{
+  "builders": [{
+    "type": "azure-arm",
+    "subscription_id": "PUT YOUR SUBSCRIPTION_ID HERE",
+    "client_id":        "PUT YOUR CLIENT_ID HERE",
+    "client_secret":   "PUT YOUR CLIENT_SECRET HERE",
+    "tenant_id":     "PUT YOUR TENANT_ID HERE",
+    "managed_image_resource_group_name": "Nipun1",
+    "managed_image_name": "Kubernetes_image",
+
+    "os_type": "Linux",
+    "image_publisher": "Canonical",
+    "image_offer": "UbuntuServer",
+    "image_sku": "18.04-LTS",
+
+    "azure_tags": {
+        "purpose": "kubernetes",
+        "role": "compute"
+    },
+
+    "location": "East US",
+    "vm_size": "Standard_DS2_v2"
+  }],
+  "provisioners": [{
+    "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo -E sh '{{ .Path }}'",
+    "inline": [
+      "sudo apt-get install -qy docker.io",
+      "sudo apt-get install -y apt-transport-https",
+      "curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -",
+      "echo \"deb https://apt.kubernetes.io/ kubernetes-xenial main\" > /etc/apt/sources.list.d/kubernetes.list",
+      "apt-get update",
+      "apt-get install -y kubelet kubeadm kubectl",
+      "apt-mark hold kubelet kubeadm kubectl",
+      "wget https://github.com/coreos/flannel/releases/download/v0.11.0/flannel-v0.11.0-linux-amd64.tar.gz -P /home/ubuntu/"
+    ],
+    "inline_shebang": "/bin/sh -x",
+    "type": "shell"
+  }]
+}

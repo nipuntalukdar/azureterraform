@@ -1,0 +1,39 @@
+{
+  "builders": [{
+    "type": "azure-arm",
+    "subscription_id": "PUT YOUR SUBSCRIPTION_ID HERE",
+    "client_id":        "PUT YOUR CLIENT_ID HERE",
+    "client_secret":   "PUT YOUR CLIENT_SECRET HERE",
+    "tenant_id":     "PUT YOUR TENANT_ID HERE",
+    "managed_image_resource_group_name": "Nipun1",
+    "managed_image_name": "elasticsearch_image",
+
+    "os_type": "Linux",
+    "image_publisher": "Canonical",
+    "image_offer": "UbuntuServer",
+    "image_sku": "18.04-LTS",
+
+    "azure_tags": {
+        "purpose": "elasticsearch",
+        "role": "elasticsearchall"
+    },
+
+    "location": "East US",
+    "vm_size": "Standard_DS2_v2"
+  }],
+  "provisioners": [{
+    "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo -E sh '{{ .Path }}'",
+    "inline": [
+      "wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.9.deb",
+      "apt-get -qy install openjdk-8-jre",
+      "dpkg -i elasticsearch-5.6.9.deb",
+      "rm elasticsearch-5.6.9.deb",
+      "systemctl stop elasticsearch",
+      "systemctl disable elasticsearch",
+      "rm -rf /var/lib/elasticsearch/*",
+      "rm -rf /var/log/elasticsearch/*"
+    ],
+    "inline_shebang": "/bin/bash -x",
+    "type": "shell"
+  }]
+}
